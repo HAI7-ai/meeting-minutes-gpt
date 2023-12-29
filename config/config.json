@@ -1,0 +1,10 @@
+{
+    "DEFAULT_MODEL": "gpt-4",
+    "LARGE_CONTEXT_MODEL": "gpt-4-1106-preview",
+
+    "KNOWLEDGE_BASE_DIR": "knowledge_base",
+    "FAISS_DB_DIR": "vector_store/db_faiss",
+
+    "CHUNK_SIZE": 1000,
+    "CHUNK_OVERLAP": 100
+}
