@@ -1,0 +1,7 @@
+[ui]
+hideSidebarNav = true
+
+[theme]
+base="dark"
+primaryColor="#007FFF"
+font="sans serif"
