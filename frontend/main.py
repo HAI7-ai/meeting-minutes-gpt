@@ -54,7 +54,7 @@ if "db_exist" not in st.session_state:
     st.session_state.db_exist = False
     st.session_state.db_list = False
 
-connection_string = "DefaultEndpointsProtocol=https;AccountName=meetingminutesblob;AccountKey=jDf6wQRbY5/W10J33STqdrJeT3w2m/SXWUNzIw4qlmfBLwg5Lt2qoDEAA/LOsmILPvli4i5j+4WX+AStJPv96A==;EndpointSuffix=core.windows.net"
+connection_string = os.environ.get("CONNECTION_STRING")
 container_name = "meeting-minutes"
 
 blob_service_client = BlobServiceClient.from_connection_string(connection_string)
