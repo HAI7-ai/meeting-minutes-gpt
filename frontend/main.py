@@ -17,6 +17,8 @@ from pages.settings import (
     write_uploaded_files,
     meeting_minutes
 )
+import io
+import base64
 
 # Get the absolute path to the project root directory
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -278,16 +280,10 @@ def read_text(file_path):
     else:
         return "Unsupported file format"
 
-def save_as_docx(minutes, filename):   
-    filename_without_extension = os.path.splitext(filename)[0]
-    doc = Document()  
-    
-    # Get the user's download folder
-    download_folder = os.path.expanduser("~") + "/Downloads/"
-    
-    # Combine the download folder path with the filename and .docx extension
-    file_path = os.path.join(download_folder, "Meeting_Minutes_" + filename_without_extension + ".docx")
-    
+def generate_docx(minutes, filename):
+    doc = Document()
+    file_stream = io.BytesIO()
+
     for key, value in minutes.items():
         # Replace underscores with spaces and capitalize each word for the heading
         heading = ' '.join(word.capitalize() for word in key.split('_'))
@@ -295,17 +291,20 @@ def save_as_docx(minutes, filename):
         doc.add_paragraph(value)
         # Add a line break between sections
         doc.add_paragraph()
-        
-    doc.save(file_path)
-    
-    # Check if the file was successfully saved
-    if os.path.exists(file_path):
-        st.success(f"File saved successfully! You can find it in your Downloads folder as '{file_path}'.")
 
-    else:
-        st.error("There was an issue saving the file. Please try again.")
+    doc.save(file_stream)
+    file_stream.seek(0)
+
+    st.markdown(get_binary_file_downloader_html(file_stream, filename), unsafe_allow_html=True)
     
     delete_folder_contents(mm_uploads_path)
+
+# Function to create a download link
+def get_binary_file_downloader_html(bin_file, file_label='File'):
+    data = bin_file.getvalue()
+    b64 = base64.b64encode(data).decode()
+    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_label}.docx">Download {file_label}</a>'
+    return href
 
 def upload_files():
     """ A streamlit function to provide upload interface for documents and extract information from it.
@@ -337,7 +336,7 @@ def upload_files():
                     transcription = read_text(file_path)
                     minutes = meeting_minutes(transcription)
                     filename = os.path.basename(file_path)
-                    save_as_docx(minutes, filename)
+                    generate_docx(minutes, filename)
 
 def main_page():
     """Streamlit content for Admin page"""
